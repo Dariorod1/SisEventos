@@ -20,6 +20,9 @@ module.exports = (sequelize) => {
         },
         entradasDisponibles: {
             type: DataTypes.INTEGER,
-        }
+        },
+        foto: {
+            type: DataTypes.STRING,
+        },
     });
 };

@@ -16,7 +16,6 @@ export function validate(input) {
   if (!input.password) {
     errors.password = "Se requiere una contraseña";
   }
-
   return errors;
 }
 
@@ -81,7 +80,7 @@ const Login = () => {
         <div className="inputGroup">
           <label className="labels" htmlFor="email"></label>
           <input
-            placeholder="email@yoagronomo.com"
+            placeholder="email@gmail.com"
             className="loginInput"
             type="email"
             id="email"

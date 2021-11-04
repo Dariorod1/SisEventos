@@ -9,7 +9,7 @@ const { mailPaymentCompleted, mailPaymentInProcess } = require("../mails/mensaje
 mercadopago.configure({
     access_token: "TEST-5296059951015167-110320-c329bb579f48cf40f21c4e5a418aa5f8-232468002",
 });
-//Funcion para obtener las empresas buscadas por el nombre
+//Funcion para obtener las eventos buscadas por el nombre
 
 const getEventoByName = async(req, res, next) => {
     const nombreEvento = req.query.name.toLocaleLowerCase();
@@ -30,6 +30,7 @@ const getEventoByName = async(req, res, next) => {
         res.status(500).send(next);
     }
 };
+//funcion que devuelve todos los eventos de la base de datos
 const getAllEventos = async(req, res, next) => {
     try {
         const eventos = await Evento.findAll();
@@ -42,6 +43,7 @@ const getAllEventos = async(req, res, next) => {
         });
     }
 };
+//devuelve los eventos buscados por ID
 const getEventoById = async(req, res, next) => {
     const { id } = req.params;
     try {
@@ -59,9 +61,9 @@ const getEventoById = async(req, res, next) => {
         });
     }
 };
-
+//crea un nuevo evento
 const createEvento = async(req, res, next) => {
-    const { nombre, fecha, hora, lugar, precioEntrada, entradasDisponibles } = req.body;
+    const { nombre, fecha, hora, lugar, precioEntrada, entradasDisponibles, foto } = req.body;
     if (req.file) {
         var eventos = req.file.filename;
     }
@@ -72,7 +74,8 @@ const createEvento = async(req, res, next) => {
             hora,
             lugar,
             precioEntrada,
-            entradasDisponibles
+            entradasDisponibles,
+            foto: eventos
         });
         return res.json({ evento: evento, msg: "Evento creado con exito" });
     } catch (error) {
@@ -80,6 +83,7 @@ const createEvento = async(req, res, next) => {
         res.status(500).send(next);
     }
 };
+//genera el pago y resta la cantidad de entradas compradas
 const restaEntrada = async(req, res, next) => {
     const { cantidad } = req.body;
     const { id } = req.params;
@@ -88,7 +92,7 @@ const restaEntrada = async(req, res, next) => {
         let preference = {
             items: [],
             back_urls: {
-                success: `http://localhost:3000/eventos/home`,
+                success: `http://localhost:3000/eventos/`,
                 failure: `http://localhost:3001/eventos/`,
                 pending: `http://localhost:3001/eventos/`,
             },
@@ -249,6 +253,18 @@ const mercadoPagoNotifications = async(req, res) => {
         console.log("error ", err);
     }
 };
+const getImageEvento = (req, res) => {
+    let getImage;
+    const { name } = req.params;
+    let pathImage = path.join(__dirname, "../");
+    try {
+        getImage = fs.readFileSync(`${pathImage}uploads/${name}`);
+    } catch (error) {
+        getImage = fs.readFileSync(`${pathImage}uploads/noImage.png`);
+    }
+    res.set({ "Content-Type": "image/png" });
+    res.send(getImage);
+};
 
 
 
@@ -258,5 +274,6 @@ module.exports = {
     createEvento,
     restaEntrada,
     getEventoById,
-    mercadoPagoNotifications
+    mercadoPagoNotifications,
+    getImageEvento
 };
